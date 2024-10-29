@@ -1,0 +1,114 @@
+* Setup a new project
+1. Go to Spring initializr website
+2. Choose the project package manger as Maven or Gradle
+3. Language as Java and other formalities
+4. Add dependencies for - ~Spring for RabbitMQ in messaging~, ~Spring Web in Web for RESTAPI~
+5. Download the zip file and open it in your favourite IDE
+
+* Connect to rabbitmq
+** Application Properties
+In your ~resources/application.properties~, define the rabbitmq properties as follows.
+#+begin_src text
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
+#+end_src
+
+* Exchange, Queues and Bindings
+Let's define a property for queue in ~application.properties~ as ~rabbitmq.queue.name~.
+And create a new Java class called RabbitMQConfig as defined below.
+
+#+begin_src java :noeval
+@Configuration
+public class RabbitMQConfig {
+    @Value("${rabbitmq.queue.name}")
+    private String queue;
+
+    @Value("${rabbitmq.exchange.name}")
+    private String exchange;
+
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
+
+    // spring bean for rabbitmq queue
+    @Bean
+    public Queue queue() {
+        return new Queue(queue);
+    }
+
+    @Bean
+    public TopicExchange exchange() {
+        return new TopicExchange(exchange);
+    }
+
+    @Bean
+    public Binding binding() {
+        return BindingBuilder.bind(queue()).to(exchange()).with(routingKey);
+    }
+
+
+    // If you want to convert the message to json and then send it to rabbitmq
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(jsonMessageConverter());
+        return rabbitTemplate;
+    }
+}
+#+end_src
+* Producer
+A producer sends a message to rabbitmq.
+The producer sends a message along with a routing key to identiy the exchange to select a queue (or multiple queues) for temporary storage.
+Springboot producer class will just have a method, ~sendMessage~ which you can define as follows.
+
+~rabbitTemplate.convertAndSend()~ is the method that finally sends the message.
+
+#+begin_src java :noeval
+@Service
+public class RabbitMQProducer {
+    @Value("${learnrabbitmq.exchange}")
+    private String exchange;
+
+    @Value("${learnrabbitmq.routingkey}")
+    private String routingkey;
+
+    private static final Logger logger = LoggerFactory.getLogger(RabbitMQProducer.class);
+
+    private RabbitTemplate rabbitTemplate;
+    public RabbitMQProducer(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
+    // If you want to send json
+    // Simply use the POJO for the json in place of String message
+    public void sendMessage(String message) {
+        logger.info("Sending message  " + "rabbitmq");
+        rabbitTemplate.convertAndSend(exchange, routingkey, message);
+    }
+}
+#+end_src
+* Consumer
+Consumer continuously listens for the queue, and if a message arrives in the queue, it fetches it.
+So there is a listner associated with the consumer, called ~RabbitListner~.
+
+#+begin_src java :noeval
+public class RabbitMQConsumer {
+    Logger logger = LoggerFactory.getLogger(RabbitMQConsumer.class);
+
+    // This method will be invoked whenever we have any message
+    // Same as producer, use POJO in place of String in case of JSON
+    @RabbitListener(queues = {"${rabbitmq.queue.name}"})
+    public void consumeMessage(String message) {
+        logger.info("Message received: " + message);
+    }
+}
+#+end_src
+
+* Reference
+https://www.youtube.com/watch?v=0--Ll3WHMTQ
