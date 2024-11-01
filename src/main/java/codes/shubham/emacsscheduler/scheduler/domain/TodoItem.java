@@ -22,10 +22,12 @@ public class TodoItem {
     boolean isPinned;
     LocalTime deadline;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     LocalTime startTime;
 
     public LocalTime getEndTime() {
+        if (startTime == null) return null;
+
         // Don't let the end time exceed tonight
         if (startTime.isAfter(startTime.plus(duration))) {
             return LocalTime.of(23,59,59);
@@ -34,6 +36,7 @@ public class TodoItem {
     }
 
     public LocalTime getEndTimeWithBuffer() {
+        if (startTime == null) return null;
         return getEndTime().plusMinutes(15);
     }
 

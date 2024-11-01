@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalTime;
 
 @Data
-public class Output {
+public class SchedulesOutput {
     private String title;
     private LocalTime startTime;
     private LocalTime endTime;

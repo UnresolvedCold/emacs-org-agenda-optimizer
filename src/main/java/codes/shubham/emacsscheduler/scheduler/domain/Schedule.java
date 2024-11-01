@@ -29,6 +29,10 @@ public class Schedule {
         this.timeBlocks = timeBlocks;
     }
 
+    public HardSoftScore getScore() {
+        return score;
+    }
+
     public List<TodoItem> getTodoItems() {
         return todoItems;
     }
