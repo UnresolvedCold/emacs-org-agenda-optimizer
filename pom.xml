@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>codes.shubham</groupId>
-	<artifactId>learnrabbitmq</artifactId>
+	<artifactId>emacsscheduler</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>learnrabbitmq</name>
+	<name>emacsscheduler</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
