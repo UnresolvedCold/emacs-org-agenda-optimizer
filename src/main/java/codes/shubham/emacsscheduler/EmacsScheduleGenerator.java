@@ -42,30 +42,29 @@ public class EmacsScheduleGenerator {
 		Schedule problem = new Schedule(tasksToSchedule,  timeBlocks);
 
 		Schedule schedule = solverManager.solve("problem", problem).getFinalBestSolution();
-		if (schedule.getScore().isFeasible()) {
 
-			System.out.println(schedule);
-			List<SchedulesOutput> schedulesOutput = new ArrayList<>();
-			for (TodoItem todoItem : schedule.getTodoItems()) {
-				SchedulesOutput out = new SchedulesOutput();
-				out.setTitle(todoItem.getName());
-				out.setStartTime(todoItem.getStartTime());
-				out.setEndTime(todoItem.getEndTime());
-				out.setDuration((int) todoItem.getDuration().toMinutes());
-				out.setPinned(todoItem.isPinned());
-				out.setItemType(todoItem.getItemType().toString());
-				schedulesOutput.add(out);
-			}
-
-			schedulesOutput.sort((o1, o2) -> o1.getStartTime().compareTo(o2.getStartTime()));
-
-			return schedulesOutput;
+		System.out.println(schedule);
+		List<SchedulesOutput> schedulesOutput = new ArrayList<>();
+		for (TodoItem todoItem : schedule.getTodoItems()) {
+			SchedulesOutput out = new SchedulesOutput();
+			out.setTitle(todoItem.getName());
+			out.setStartTime(todoItem.getStartTime());
+			out.setEndTime(todoItem.getEndTime());
+			out.setDuration((int) todoItem.getDuration().toMinutes());
+			out.setPinned(todoItem.isPinned());
+			out.setItemType(todoItem.getItemType().toString());
+			schedulesOutput.add(out);
 		}
-		else {
-			SchedulesOutput error = new SchedulesOutput();
-			error.setTitle("Error: No feasible schedule can be generated");
-			return new ArrayList<>(List.of(error));
-		}
+
+		schedulesOutput.sort((o1, o2) -> {
+			if (o1.getStartTime()==null && o2.getStartTime()==null) return 0;
+			if (o1.getStartTime()==null) return 1;
+			if (o2.getStartTime()==null) return -1;
+
+			return o1.getStartTime().compareTo(o2.getStartTime());
+		});
+
+		return schedulesOutput;
 	}
 
 	private List<LocalTime> divideDayInTimeBlocks() {

@@ -2,6 +2,7 @@ package codes.shubham.emacsscheduler.orgparse;
 
 import codes.shubham.emacsscheduler.interfaces.TodoProvider;
 import codes.shubham.emacsscheduler.orgparse.pojo.Todo;
+import codes.shubham.emacsscheduler.scheduler.domain.Priority;
 import codes.shubham.emacsscheduler.scheduler.domain.TodoItem;
 import codes.shubham.emacsscheduler.scheduler.pojo.ItemType;
 import com.orgzly.org.OrgProperties;
@@ -74,9 +75,20 @@ public class AgendaTodoProvider implements TodoProvider {
                 isPinned = true;
             }
 
+            Priority priority = Priority.MEDIUM;
+            if (todo.getPriority()!=null) {
+                if (todo.getPriority().equals("A")) {
+                    priority = Priority.HIGH;
+                } else if (todo.getPriority().equals("C")) {
+                    priority = Priority.LOW;
+                } else {
+                    priority = Priority.MEDIUM;
+                }
+            }
+
             TodoItem todoItem = new TodoItem(todo.getTitle(),
                     Duration.ofMinutes(todo.getEffort()),
-                    itemType, isPinned);
+                    itemType, isPinned, priority);
 
             if (todoItem.isPinned()) {
                 todoItem.setStartTime(todo.getScheduledTime());

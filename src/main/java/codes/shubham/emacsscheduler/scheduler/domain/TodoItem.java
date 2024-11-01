@@ -22,8 +22,10 @@ public class TodoItem {
     boolean isPinned;
     LocalTime deadline;
 
-    @PlanningVariable(allowsUnassigned = true)
+    @PlanningVariable()
     LocalTime startTime;
+
+    Priority priority;
 
     public LocalTime getEndTime() {
         if (startTime == null) return null;
@@ -42,16 +44,17 @@ public class TodoItem {
 
     public TodoItem() {}
 
-    public TodoItem(String name, Duration duration, ItemType itemType, boolean isPinned) {
+    public TodoItem(String name, Duration duration, ItemType itemType, boolean isPinned, Priority priority) {
         this.name = name;
         this.duration = duration;
         this.itemType = itemType;
         this.isPinned = isPinned;
+        this.priority = priority;
         this.deadline = LocalTime.of(23, 59, 59);
     }
 
-    public TodoItem(String name, Duration duration, ItemType itemType, boolean isPinned, LocalTime deadline) {
-        this(name, duration, itemType, isPinned);
+    public TodoItem(String name, Duration duration, ItemType itemType, boolean isPinned, Priority priority, LocalTime deadline) {
+        this(name, duration, itemType, isPinned, priority);
         this.deadline = deadline;
     }
 
