@@ -1,6 +1,6 @@
-package codes.shubham.learnrabbitmq.publisher;
+package codes.shubham.emacsscheduler.learnrabbitmq.publisher;
 
-import codes.shubham.learnrabbitmq.dto.Data;
+import codes.shubham.emacsscheduler.learnrabbitmq.dto.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

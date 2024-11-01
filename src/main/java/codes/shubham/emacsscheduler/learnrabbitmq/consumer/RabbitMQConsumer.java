@@ -1,4 +1,4 @@
-package codes.shubham.learnrabbitmq.consumer;
+package codes.shubham.emacsscheduler.learnrabbitmq.consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

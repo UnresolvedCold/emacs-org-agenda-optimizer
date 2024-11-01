@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       d8196e5d-3a23-41b8-a854-8fffa06fd323
+:END:
+#+TITLE: 2024-08-10
+
+* Work Related :company::FY_2024:
+** DONE [#A] Aile awareness in MVTS :mvts:
+CLOSED: [2024-08-14 Wed 11:33] SCHEDULED: <2024-08-12 Mon> DEADLINE: <2024-08-17 Sat>
+* Personal
+** LRN [#A] Learn in-depth about Spring Frameork and Springboot
+SCHEDULED: <2024-11-01 Fri 07:00-10:00> DEADLINE: <2024-11-02 Sat>
+:PROPERTIES:
+:Effort:   3
+:END:
+https://www.udemy.com/course/spring_boot/learn/lecture/43256562?start=0#overview
+** DONE [#B] Revisit Java and learn advance concepts
+CLOSED: [2024-08-31 Sat 00:09] SCHEDULED: <2024-08-24 Sat> DEADLINE: <2024-08-24 Sat>
+https://www.udemy.com/course/java_basics_to_advanced/learn/lecture/41998128#overview
+** CANCELLED [#B] Implement design pattens in Java
+CLOSED: [2024-09-14 Sat 00:41] DEADLINE: <2024-09-14 Sat>
+** TODO [#B] Indepth understanding of Architecture and related concepts
+DEADLINE: <2024-11-02 Sat>
+** TODO [#B] Get comfortable with LLDs and HLDs
+DEADLINE: <2024-11-02 Sat>
+https://www.udemy.com/course/system_design_lld_hld/learn/lecture/41932768?start=0#overview
+** TODO [#B] Revisit the latest React Framework
+** CANCELLED [#B] Revsit JavaScript and Python
+CLOSED: [2024-09-14 Sat 00:41] DEADLINE: <2024-09-14 Sat>
+** TODO [#B] Learn GoLang
+DEADLINE: <2024-11-30 Sat>
+** DONE [#C] Buy dog food and doi
+CLOSED: [2024-08-10 Sat 15:55] SCHEDULED: <2024-08-10 Sat>
+** DONE [#B] Complete your 5 year plan
+CLOSED: [2024-08-15 Thu 09:27] SCHEDULED: <2024-08-14 Wed>
+** DONE [#C] Clean bathroom
+CLOSED: [2024-08-14 Wed 11:55] SCHEDULED: <2024-08-10 Sat>
+** CANCELLED [#C] Wash your clothes
+CLOSED: [2024-08-14 Wed 11:55] SCHEDULED: <2024-08-10 Sat>

@@ -1,4 +1,4 @@
-package codes.shubham.learnrabbitmq.dto;
+package codes.shubham.emacsscheduler.learnrabbitmq.dto;
 
 public class Data {
     int i;
