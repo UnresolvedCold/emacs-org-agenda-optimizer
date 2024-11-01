@@ -1,5 +1,9 @@
 package codes.shubham.emacsscheduler.orgparse;
 
+import codes.shubham.emacsscheduler.interfaces.TodoProvider;
+import codes.shubham.emacsscheduler.orgparse.pojo.Todo;
+import codes.shubham.emacsscheduler.scheduler.domain.TodoItem;
+import codes.shubham.emacsscheduler.scheduler.pojo.ItemType;
 import com.orgzly.org.OrgProperties;
 import com.orgzly.org.datetime.OrgRange;
 import com.orgzly.org.parser.*;
@@ -8,22 +12,35 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 
-public class Agenda {
+public class AgendaTodoProvider implements TodoProvider {
+
+    List<String> todosDirectories = new ArrayList<>(List.of(
+            "/home/cold/org/roam/journal/",
+            "D:\\Shared\\org\\roam\\journal\\"
+    ));
+
+    List<String> todosFiles = new ArrayList<>(List.of(
+            "/home/cold/org/agenda-per.org",
+            "/home/cold/org/agenda-fin.org",
+            "D:\\Shared\\org\\agenda-per.org",
+            "D:\\Shared\\org\\agenda-fin.org"
+    ));
 
     //singleton
-    private static Agenda instance = null;
-    private Agenda() {
+    private static AgendaTodoProvider instance = null;
+    private AgendaTodoProvider() {
     }
-    public static Agenda getInstance() {
+    public static AgendaTodoProvider getInstance() {
         if (instance == null) {
-            synchronized (Agenda.class) {
+            synchronized (AgendaTodoProvider.class) {
                 if (instance == null) {
-                    instance = new Agenda();
+                    instance = new AgendaTodoProvider();
                 }
             }
         }
@@ -31,10 +48,47 @@ public class Agenda {
     }
 
     public static void main(String[] args) {
-        List<Todo> todos = Agenda.getInstance().getTodayTodoFromOrgDirectory("D:\\Shared\\org\\roam\\journal\\");
+        List<Todo> todos = AgendaTodoProvider.getInstance().getTodayTodoFromOrgDirectory("D:\\Shared\\org\\roam\\journal\\");
         for (Todo todo: todos) {
             System.out.println(todo);
         }
+    }
+
+    @Override
+    public List<TodoItem> getTodos() {
+        List<Todo> todos = new ArrayList<>();
+        for (String dir: todosDirectories) {
+            todos.addAll(getTodayTodoFromOrgDirectory(dir));
+        }
+        for (String file: todosFiles) {
+            todos.addAll(getTodayTodoFromFile(file));
+        }
+
+        List<TodoItem> todoItems = new ArrayList<>();
+        for (Todo todo: todos) {
+            ItemType itemType = ItemType.PERSONAL;
+            if (todo.getTags().contains("company")) itemType = ItemType.WORK;
+
+            boolean isPinned = false;
+            if (todo.getScheduledTime() != null) {
+                isPinned = true;
+            }
+
+            TodoItem todoItem = new TodoItem(todo.getTitle(),
+                    Duration.ofMinutes(todo.getEffort()),
+                    itemType, isPinned);
+
+            if (todoItem.isPinned()) {
+                todoItem.setStartTime(todo.getScheduledTime());
+            }
+
+            if (todo.getDeadlineTime() != null) {
+                todoItem.setDeadline(todo.getDeadlineTime());
+            }
+
+            todoItems.add(todoItem);
+        }
+        return todoItems;
     }
 
     public List<Todo> getTodayTodoFromOrgDirectory(String dir) {
@@ -54,7 +108,6 @@ public class Agenda {
 
             return todos;
         } catch (Exception e) {
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -107,7 +160,7 @@ public class Agenda {
                             .toLocalTime();
                 }
 
-                int effort = 60; // mins
+                int effort = 60; // default 60 minutes
 
                 if (scheduled.getStartTime().getEndCalendar()!=null) {
                     Date endTime = scheduled.getStartTime().getEndCalendar().getTime();
@@ -129,6 +182,7 @@ public class Agenda {
                     }
                 }
 
+                // If not scheduled today, then reschedule it today
                 if (!isScheduledToday(today, scheduled.getStartTime().getCalendar())) {
                     scheduledLocalTime = null;
                 }
@@ -145,7 +199,6 @@ public class Agenda {
             }
             return todos;
         } catch (Exception e) {
-            e.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -174,7 +227,6 @@ public class Agenda {
     }
 
     private String readFileToString(String filePath) throws IOException {
-        // huge file
         byte[] encoded = Files.readAllBytes(Paths.get(filePath));
         return new String(encoded);
     }

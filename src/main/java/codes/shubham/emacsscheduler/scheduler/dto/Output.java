@@ -1,4 +1,4 @@
-package codes.shubham.emacsscheduler.scheduler;
+package codes.shubham.emacsscheduler.scheduler.dto;
 
 import lombok.Data;
 

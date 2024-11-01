@@ -1,4 +1,4 @@
-package codes.shubham.emacsscheduler.scheduler;
+package codes.shubham.emacsscheduler.scheduler.domain;
 
 import ai.timefold.solver.core.api.domain.solution.PlanningEntityCollectionProperty;
 import ai.timefold.solver.core.api.domain.solution.PlanningScore;

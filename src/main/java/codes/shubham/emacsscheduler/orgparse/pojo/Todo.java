@@ -1,4 +1,4 @@
-package codes.shubham.emacsscheduler.orgparse;
+package codes.shubham.emacsscheduler.orgparse.pojo;
 
 import lombok.Getter;
 import lombok.Setter;
