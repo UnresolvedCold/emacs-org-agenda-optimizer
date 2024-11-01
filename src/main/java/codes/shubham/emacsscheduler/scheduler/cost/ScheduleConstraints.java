@@ -1,9 +1,10 @@
 package codes.shubham.emacsscheduler.scheduler.cost;
 
-import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
+import ai.timefold.solver.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
 import ai.timefold.solver.core.api.score.stream.Constraint;
 import ai.timefold.solver.core.api.score.stream.ConstraintFactory;
 import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
+import codes.shubham.emacsscheduler.scheduler.domain.Priority;
 import codes.shubham.emacsscheduler.scheduler.pojo.ItemType;
 import codes.shubham.emacsscheduler.scheduler.domain.TodoItem;
 import org.joda.time.DateTime;
@@ -15,7 +16,7 @@ import static ai.timefold.solver.core.api.score.stream.Joiners.overlapping;
 
 public class ScheduleConstraints implements ConstraintProvider {
 
-    public static LocalTime dayStartTime = LocalTime.of(9, 0, 0);
+    public static LocalTime dayStartTime = LocalTime.of(7, 0, 0);
     public static LocalTime dayEndTime = LocalTime.of(22, 0, 0);
     public static LocalTime workStartTime = LocalTime.of(11, 0, 0);
     public static LocalTime workEndTime = LocalTime.of(19, 0, 0);
@@ -47,9 +48,10 @@ public class ScheduleConstraints implements ConstraintProvider {
         // compare the start times
         // If high priority task is starting after low priority task -> penalize
         return constraintFactory.forEachUniquePair(TodoItem.class)
-                .filter((item1, item2) -> item1.getPriority().compareTo(item2.getPriority()) < 0)
-                .filter((item1, item2) -> item1.getStartTime().isAfter(item2.getStartTime()))
-                .penalize(HardSoftScore.ONE_SOFT)
+                .filter((item1, item2) -> !item1.isPinned() && !item2.isPinned())
+                .filter((item1, item2) -> Priority.compare(item1.getPriority(), item2.getPriority()) != 0)
+                .filter((item1, item2) -> TodoItem.isPriorityConflict(item1, item2))
+                .penalize(HardMediumSoftScore.ONE_MEDIUM)
                 .asConstraint("prefer high priority tasks first");
     }
 
@@ -57,7 +59,7 @@ public class ScheduleConstraints implements ConstraintProvider {
         return constraintFactory.forEach(TodoItem.class)
                 .filter(item -> item.getDeadline().isBefore(item.getEndTime()))
                 .filter(item -> !item.isPinned())
-                .penalize(HardSoftScore.ONE_HARD)
+                .penalize(HardMediumSoftScore.ONE_SOFT)
                 .asConstraint("schedule task before deadline");
     }
 
@@ -66,7 +68,7 @@ public class ScheduleConstraints implements ConstraintProvider {
         return constraintFactory.forEachUniquePair(TodoItem.class,
                         overlapping(TodoItem::getStartTime, TodoItem::getEndTimeWithBuffer))
                 .filter((item1, item2) -> item1.getStartTime().isBefore(item2.getEndTimeWithBuffer()))
-                .penalize(HardSoftScore.ONE_SOFT)
+                .penalize(HardMediumSoftScore.ONE_SOFT)
                 .asConstraint("prefer breaks between tasks");
     }
 
@@ -74,7 +76,7 @@ public class ScheduleConstraints implements ConstraintProvider {
         return constraintFactory.forEach(TodoItem.class)
                 .filter(item -> item.getStartTime().isBefore(currentTime))
                 .filter(item -> !item.isPinned())
-                .penalize(HardSoftScore.ONE_HARD)
+                .penalize(HardMediumSoftScore.ONE_HARD)
                 .asConstraint("create new schedules after current time");
     }
 
@@ -83,7 +85,7 @@ public class ScheduleConstraints implements ConstraintProvider {
                 .filter(item -> item.getStartTime().isBefore(dayStartTime)
                         || item.getEndTime().isAfter(dayEndTime))
                 .filter(item -> !item.isPinned())
-                .penalize(HardSoftScore.ONE_HARD)
+                .penalize(HardMediumSoftScore.ONE_SOFT)
                 .asConstraint("generate schedules within day active hours");
     }
 
@@ -94,7 +96,7 @@ public class ScheduleConstraints implements ConstraintProvider {
                         item.getStartTime().isAfter(workStartTime)
                         && item.getEndTime().isBefore(workEndTime))
                 .filter(item -> !item.isPinned())
-                .penalize(HardSoftScore.ONE_SOFT)
+                .penalize(HardMediumSoftScore.ONE_SOFT)
                 .asConstraint("prefer personal items in non-working hours");
     }
 
@@ -105,14 +107,15 @@ public class ScheduleConstraints implements ConstraintProvider {
                         item.getStartTime().isBefore(workStartTime)
                         || item.getEndTime().isAfter(workEndTime))
                 .filter(item -> !item.isPinned())
-                .penalize(HardSoftScore.ONE_SOFT)
+                .penalize(HardMediumSoftScore.ONE_SOFT)
                 .asConstraint("prefer work items in work hours");
     }
 
     private Constraint overlappingTime(ConstraintFactory constraintFactory) {
         return constraintFactory.forEachUniquePair(TodoItem.class,
                         overlapping(TodoItem::getStartTime, TodoItem::getEndTime))
-                .penalize(HardSoftScore.ONE_HARD)
+                .filter((item1, item2) -> !item1.isPinned() && !item2.isPinned())
+                .penalize(HardMediumSoftScore.ONE_HARD)
                 .asConstraint("overlapping time");
     }
 }

@@ -27,6 +27,13 @@ public class TodoItem {
 
     Priority priority;
 
+    public static boolean isPriorityConflict(TodoItem item1, TodoItem item2) {
+        if (item1.getStartTime().isAfter(item2.getStartTime())) {
+            return Priority.compare(item1.getPriority(), item2.getPriority()) > 0;
+        }
+        return Priority.compare(item1.getPriority(), item2.getPriority()) < 0;
+    }
+
     public LocalTime getEndTime() {
         if (startTime == null) return null;
 

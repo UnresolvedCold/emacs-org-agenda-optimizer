@@ -53,6 +53,7 @@ public class EmacsScheduleGenerator {
 			out.setDuration((int) todoItem.getDuration().toMinutes());
 			out.setPinned(todoItem.isPinned());
 			out.setItemType(todoItem.getItemType().toString());
+			out.setPriority(todoItem.getPriority().toString());
 			schedulesOutput.add(out);
 		}
 

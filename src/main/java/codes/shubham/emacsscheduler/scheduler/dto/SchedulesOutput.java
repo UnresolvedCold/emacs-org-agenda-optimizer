@@ -12,4 +12,5 @@ public class SchedulesOutput {
     private int duration;
     private boolean isPinned;
     private String itemType;
+    private String priority;
 }
