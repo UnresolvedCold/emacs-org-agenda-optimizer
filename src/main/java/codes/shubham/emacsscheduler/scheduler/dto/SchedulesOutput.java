@@ -12,9 +12,9 @@ import java.time.LocalTime;
 @Data
 public class SchedulesOutput {
     private String title;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Kolkata")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MMM dd, yyyy HH:mm", timezone = "Asia/Kolkata")
     private DateTime startTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Kolkata")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MMM dd, yyyy HH:mm", timezone = "Asia/Kolkata")
     private DateTime endTime;
     private int duration;
     private boolean isPinned;
