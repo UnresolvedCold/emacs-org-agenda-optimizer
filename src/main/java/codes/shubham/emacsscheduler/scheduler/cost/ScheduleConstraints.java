@@ -32,6 +32,7 @@ public class ScheduleConstraints implements ConstraintProvider {
         constraints.add(preferBreaksBetweenTasks(constraintFactory));
         constraints.add(scheduleTaskBeforeDeadline(constraintFactory));
         constraints.add(preferHighPriorityTasksFirst(constraintFactory));
+        constraints.add(reduceTheGapBetweenTasks(constraintFactory));
 
         // if not holidays
         Set<Integer> workingDays = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
@@ -41,6 +42,14 @@ public class ScheduleConstraints implements ConstraintProvider {
         }
 
         return constraints.toArray(new Constraint[0]);
+    }
+
+    private Constraint reduceTheGapBetweenTasks(ConstraintFactory constraintFactory) {
+        return constraintFactory.forEachUniquePair(TodoItem.class)
+                .filter((item1, item2) -> !item1.isPinned() && !item2.isPinned())
+                .filter((item1, item2) -> item1.getEndTimeWithBuffer().isBefore(item2.getStartTime()))
+                .penalize(HardMediumSoftScore.ONE_SOFT)
+                .asConstraint("reduce the gap between tasks");
     }
 
     private Constraint preferHighPriorityTasksFirst(ConstraintFactory constraintFactory) {
