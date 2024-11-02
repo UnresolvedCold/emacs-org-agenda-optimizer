@@ -127,7 +127,6 @@ public class ScheduleConstraints implements ConstraintProvider {
     private Constraint overlappingTime(ConstraintFactory constraintFactory) {
         return constraintFactory.forEachUniquePair(TodoItem.class,
                         overlapping(TodoItem::getStartTime, TodoItem::getEndTime))
-                .filter((item1, item2) -> !item1.isPinned() && !item2.isPinned())
                 .penalize(HardMediumSoftScore.ONE_HARD)
                 .asConstraint("overlapping time");
     }
