@@ -7,10 +7,13 @@ import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
 import ai.timefold.solver.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
 import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import org.joda.time.DateTime;
 
 import java.time.LocalTime;
 import java.util.List;
 
+@Getter
 @PlanningSolution
 public class Schedule {
     @PlanningEntityCollectionProperty
@@ -18,32 +21,20 @@ public class Schedule {
 
     @ValueRangeProvider
     @JsonIgnore
-    List<LocalTime> timeBlocks;
+    List<DateTime> timeBlocks;
 
     @PlanningScore
     HardMediumSoftScore score;
 
     public Schedule() {}
 
-    public Schedule(List<TodoItem> todoItems, List<LocalTime> timeBlocks) {
+    public Schedule(List<TodoItem> todoItems, List<DateTime> timeBlocks) {
         this.todoItems = todoItems;
         this.timeBlocks = timeBlocks;
     }
 
-    public HardMediumSoftScore getScore() {
-        return score;
-    }
-
-    public List<TodoItem> getTodoItems() {
-        return todoItems;
-    }
-
     public void setTodoItems(List<TodoItem> todoItems) {
         this.todoItems = todoItems;
-    }
-
-    public List<LocalTime> getTimeBlocks() {
-        return timeBlocks;
     }
 
 

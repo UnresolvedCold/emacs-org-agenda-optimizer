@@ -8,6 +8,7 @@ import codes.shubham.emacsscheduler.scheduler.pojo.ItemType;
 import com.orgzly.org.OrgProperties;
 import com.orgzly.org.datetime.OrgRange;
 import com.orgzly.org.parser.*;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class AgendaTodoProvider implements TodoProvider {
             }
 
             TodoItem todoItem = new TodoItem(todo.getTitle(),
-                    Duration.ofMinutes(todo.getEffort()),
+                    todo.getEffort(),
                     itemType, isPinned, priority);
 
             if (todoItem.isPinned()) {
@@ -165,21 +166,17 @@ public class AgendaTodoProvider implements TodoProvider {
                 List<String> tags = levelTags.get(level);
                 boolean hasScheduledTime = scheduled.getStartTime().hasTime();
                 Date scheduledTime = scheduled.getStartTime().getCalendar().getTime();
-                LocalTime scheduledLocalTime = null;
+                DateTime scheduledLocalTime = null;
                 if (hasScheduledTime) {
-                    scheduledLocalTime = Instant.ofEpochMilli(scheduledTime.getTime())
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalTime();
+                    scheduledLocalTime = new DateTime(scheduledTime);
                 }
 
                 int effort = 60; // default 60 minutes
 
                 if (scheduled.getStartTime().getEndCalendar()!=null) {
                     Date endTime = scheduled.getStartTime().getEndCalendar().getTime();
-                    LocalTime endTimeLocalTime = Instant.ofEpochMilli(endTime.getTime())
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalTime();
-                    effort = (int) (endTimeLocalTime.toSecondOfDay() - scheduledLocalTime.toSecondOfDay()) / 60;
+                    DateTime endTimeLocalTime = new DateTime(endTime);
+                    effort = (int) (endTimeLocalTime.getMillis() - scheduledLocalTime.getMillis()) / 60000;
                 } else {
                     // effort can be in minutes or hours or just number (hours)
                     // 15m or 1h or 1
@@ -199,12 +196,10 @@ public class AgendaTodoProvider implements TodoProvider {
                     scheduledLocalTime = null;
                 }
 
-                LocalTime deadlineTime = null;
+                DateTime deadlineTime = null;
                 if (head.getHead().getDeadline()!=null){
-                    Date deadline = head.getHead().getDeadline().getStartTime().getCalendar().getTime();
-                    deadlineTime = Instant.ofEpochMilli(deadline.getTime())
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalTime();
+                    Calendar deadline = head.getHead().getDeadline().getStartTime().getCalendar();
+                    deadlineTime = new DateTime(deadline);
                 }
 
                 todos.add(new Todo(state, priority, title, tags, effort, scheduledLocalTime, deadlineTime));

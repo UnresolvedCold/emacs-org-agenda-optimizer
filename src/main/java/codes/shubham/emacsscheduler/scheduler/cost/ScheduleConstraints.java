@@ -16,11 +16,15 @@ import static ai.timefold.solver.core.api.score.stream.Joiners.overlapping;
 
 public class ScheduleConstraints implements ConstraintProvider {
 
-    public static LocalTime dayStartTime = LocalTime.of(7, 0, 0);
-    public static LocalTime dayEndTime = LocalTime.of(22, 0, 0);
-    public static LocalTime workStartTime = LocalTime.of(11, 0, 0);
-    public static LocalTime workEndTime = LocalTime.of(19, 0, 0);
-    public static LocalTime currentTime = LocalTime.now();
+    public static DateTime dayStartTime = DateTime.now()
+            .withTimeAtStartOfDay().withHourOfDay(7).withMinuteOfHour(0).withSecondOfMinute(0);
+    public static DateTime dayEndTime = DateTime.now()
+            .withTimeAtStartOfDay().withHourOfDay(22).withMinuteOfHour(0).withSecondOfMinute(0);
+    public static DateTime workStartTime = DateTime.now()
+            .withTimeAtStartOfDay().withHourOfDay(11).withMinuteOfHour(0).withSecondOfMinute(0);
+    public static DateTime workEndTime = DateTime.now()
+            .withTimeAtStartOfDay().withHourOfDay(19).withMinuteOfHour(0).withSecondOfMinute(0);
+    public static DateTime currentTime = DateTime.now();
 
     @Override
     public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {

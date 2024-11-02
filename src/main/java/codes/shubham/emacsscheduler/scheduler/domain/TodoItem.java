@@ -6,6 +6,7 @@ import ai.timefold.solver.core.api.domain.lookup.PlanningId;
 import ai.timefold.solver.core.api.domain.variable.PlanningVariable;
 import codes.shubham.emacsscheduler.scheduler.pojo.ItemType;
 import lombok.Data;
+import org.joda.time.DateTime;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -15,15 +16,15 @@ import java.time.LocalTime;
 public class TodoItem {
     @PlanningId
     String name;
-    Duration duration;
+    Integer duration;
     ItemType itemType;
 
     @PlanningPin
     boolean isPinned;
-    LocalTime deadline;
+    DateTime deadline;
 
     @PlanningVariable()
-    LocalTime startTime;
+    DateTime startTime;
 
     Priority priority;
 
@@ -34,33 +35,39 @@ public class TodoItem {
         return Priority.compare(item1.getPriority(), item2.getPriority()) < 0;
     }
 
-    public LocalTime getEndTime() {
+    public DateTime getEndTime() {
         if (startTime == null) return null;
 
         // Don't let the end time exceed tonight
-        if (startTime.isAfter(startTime.plus(duration))) {
-            return LocalTime.of(23,59,59);
+        if (startTime.isAfter(startTime.plusMinutes(duration))) {
+            return DateTime.now().withTimeAtStartOfDay().plusDays(1);
         }
-        return startTime.plus(duration);
+        return startTime.plusMinutes(duration);
     }
 
-    public LocalTime getEndTimeWithBuffer() {
+    public DateTime getEndTimeWithBuffer() {
         if (startTime == null) return null;
-        return getEndTime().plusMinutes(15);
+        if (getEndTime().getMillis() - getStartTime().getMillis() >= 60 * 60 * 1000) {
+            return getEndTime().plusMinutes(15);
+        }
+
+        return getEndTime().plusMinutes(5);
     }
 
     public TodoItem() {}
 
-    public TodoItem(String name, Duration duration, ItemType itemType, boolean isPinned, Priority priority) {
+    public TodoItem(String name, Integer duration, ItemType itemType, boolean isPinned, Priority priority) {
         this.name = name;
         this.duration = duration;
         this.itemType = itemType;
         this.isPinned = isPinned;
         this.priority = priority;
-        this.deadline = LocalTime.of(23, 59, 59);
+
+        // initialize with day end
+        this.deadline = new DateTime().withTimeAtStartOfDay().plusDays(1);
     }
 
-    public TodoItem(String name, Duration duration, ItemType itemType, boolean isPinned, Priority priority, LocalTime deadline) {
+    public TodoItem(String name, Integer duration, ItemType itemType, boolean isPinned, Priority priority, DateTime deadline) {
         this(name, duration, itemType, isPinned, priority);
         this.deadline = deadline;
     }

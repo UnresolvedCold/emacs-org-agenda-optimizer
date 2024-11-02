@@ -2,6 +2,7 @@ package codes.shubham.emacsscheduler.orgparse.pojo;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -14,13 +15,13 @@ public class Todo {
     String title;
     List<String> tags;
     Integer effort;
-    LocalTime scheduledTime;
-    LocalTime deadlineTime;
+    DateTime scheduledTime;
+    DateTime deadlineTime;
 
     public Todo() {
     }
 
-    public Todo(String state, String priority, String title, List<String> tags, Integer effort, LocalTime scheduledTime, LocalTime deadlineTime) {
+    public Todo(String state, String priority, String title, List<String> tags, Integer effort, DateTime scheduledTime, DateTime deadlineTime) {
         this.state = state;
         this.priority = priority;
         this.title = title;
