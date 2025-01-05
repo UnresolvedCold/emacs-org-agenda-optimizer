@@ -5,5 +5,5 @@ import codes.shubham.emacsscheduler.scheduler.domain.TodoItem;
 import java.util.List;
 
 public interface TodoProvider {
-    public List<TodoItem> getTodos();
+    public List<TodoItem> getAllTodosFromOrgFilesAndDirectories();
 }

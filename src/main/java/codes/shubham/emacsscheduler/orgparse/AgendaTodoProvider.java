@@ -1,5 +1,6 @@
 package codes.shubham.emacsscheduler.orgparse;
 
+import codes.shubham.emacsscheduler.config.ApplicationProperties;
 import codes.shubham.emacsscheduler.interfaces.TodoProvider;
 import codes.shubham.emacsscheduler.orgparse.pojo.Todo;
 import codes.shubham.emacsscheduler.scheduler.domain.Priority;
@@ -8,88 +9,40 @@ import codes.shubham.emacsscheduler.scheduler.pojo.ItemType;
 import com.orgzly.org.OrgProperties;
 import com.orgzly.org.datetime.OrgRange;
 import com.orgzly.org.parser.*;
+import jakarta.annotation.PostConstruct;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.*;
 
+@Component
 public class AgendaTodoProvider implements TodoProvider {
 
-    List<String> todosDirectories = new ArrayList<>(List.of(
-            "/home/cold/org/roam/journal/",
-            "D:\\Shared\\org\\roam\\journal\\"
-    ));
-
-    List<String> todosFiles = new ArrayList<>(List.of(
-            "/home/cold/org/agenda-per.org",
-            "/home/cold/org/agenda-fin.org",
-            "D:\\Shared\\org\\agenda-per.org",
-            "D:\\Shared\\org\\agenda-fin.org"
-    ));
-
-    //singleton
-    private static AgendaTodoProvider instance = null;
-    private AgendaTodoProvider() {
-    }
-    public static AgendaTodoProvider getInstance() {
-        if (instance == null) {
-            synchronized (AgendaTodoProvider.class) {
-                if (instance == null) {
-                    instance = new AgendaTodoProvider();
-                }
-            }
-        }
-        return instance;
-    }
-
-    public static void main(String[] args) {
-        List<Todo> todos = AgendaTodoProvider.getInstance().getTodayTodoFromOrgDirectory("D:\\Shared\\org\\roam\\journal\\");
-        for (Todo todo: todos) {
-            System.out.println(todo);
-        }
-    }
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     @Override
-    public List<TodoItem> getTodos() {
+    public List<TodoItem> getAllTodosFromOrgFilesAndDirectories() {
         List<Todo> todos = new ArrayList<>();
-        for (String dir: todosDirectories) {
+        for (String dir: applicationProperties.getOrgDirectoryList()) {
             todos.addAll(getTodayTodoFromOrgDirectory(dir));
         }
-        for (String file: todosFiles) {
+        for (String file: applicationProperties.getOrgFiles()) {
             todos.addAll(getTodayTodoFromFile(file));
         }
 
         List<TodoItem> todoItems = new ArrayList<>();
         for (Todo todo: todos) {
-            ItemType itemType = ItemType.PERSONAL;
-            if (todo.getTags().contains("company")) itemType = ItemType.WORK;
+            ItemType itemType = getItemType(todo);
+            boolean isPinned = isPinned(todo);
+            Priority priority = getPriority(todo);
 
-            boolean isPinned = false;
-            if (todo.getScheduledTime() != null) {
-                isPinned = true;
-            }
-
-            Priority priority = Priority.MEDIUM;
-            if (todo.getPriority()!=null) {
-                if (todo.getPriority().equals("A")) {
-                    priority = Priority.HIGH;
-                } else if (todo.getPriority().equals("C")) {
-                    priority = Priority.LOW;
-                } else {
-                    priority = Priority.MEDIUM;
-                }
-            }
-
-            TodoItem todoItem = new TodoItem(todo.getTitle(),
-                    todo.getEffort(),
-                    itemType, isPinned, priority);
+            TodoItem todoItem = new TodoItem(todo.getTitle(), todo.getEffort(), itemType, isPinned, priority);
 
             if (todoItem.isPinned()) {
                 todoItem.setStartTime(todo.getScheduledTime());
@@ -102,6 +55,34 @@ public class AgendaTodoProvider implements TodoProvider {
             todoItems.add(todoItem);
         }
         return todoItems;
+    }
+
+    private static Priority getPriority(Todo todo) {
+        Priority priority = Priority.MEDIUM;
+        if (todo.getPriority()!=null) {
+            if (todo.getPriority().equals("A")) {
+                priority = Priority.HIGH;
+            } else if (todo.getPriority().equals("C")) {
+                priority = Priority.LOW;
+            } else {
+                priority = Priority.MEDIUM;
+            }
+        }
+        return priority;
+    }
+
+    private static boolean isPinned(Todo todo) {
+        boolean isPinned = false;
+        if (todo.getScheduledTime() != null) {
+            isPinned = true;
+        }
+        return isPinned;
+    }
+
+    private static ItemType getItemType(Todo todo) {
+        ItemType itemType = ItemType.PERSONAL;
+        if (todo.getTags().contains("company")) itemType = ItemType.WORK;
+        return itemType;
     }
 
     public List<Todo> getTodayTodoFromOrgDirectory(String dir) {
