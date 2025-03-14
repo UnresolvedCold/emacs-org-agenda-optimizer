@@ -1,13 +1,8 @@
 package codes.shubham.emacsscheduler.scheduler.dto;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.datatype.joda.deser.DateTimeDeserializer;
 import lombok.Data;
 import org.joda.time.DateTime;
-
-import java.time.LocalTime;
 
 @Data
 public class SchedulesOutput {

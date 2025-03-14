@@ -8,9 +8,6 @@ import codes.shubham.emacsscheduler.scheduler.pojo.ItemType;
 import lombok.Data;
 import org.joda.time.DateTime;
 
-import java.time.Duration;
-import java.time.LocalTime;
-
 @PlanningEntity
 @Data
 public class TodoItem {
@@ -27,6 +24,24 @@ public class TodoItem {
     DateTime startTime;
 
     Priority priority;
+
+    public TodoItem() {}
+
+    public TodoItem(String name, Integer duration, ItemType itemType, boolean isPinned, Priority priority) {
+        this.name = name;
+        this.duration = duration;
+        this.itemType = itemType;
+        this.isPinned = isPinned;
+        this.priority = priority;
+
+        // initialize with day end
+        this.deadline = new DateTime().withTimeAtStartOfDay().plusDays(1);
+    }
+
+    public TodoItem(String name, Integer duration, ItemType itemType, boolean isPinned, Priority priority, DateTime deadline) {
+        this(name, duration, itemType, isPinned, priority);
+        this.deadline = deadline;
+    }
 
     public static boolean isPriorityConflict(TodoItem item1, TodoItem item2) {
         if (item1.getStartTime().isAfter(item2.getStartTime())) {
@@ -53,25 +68,6 @@ public class TodoItem {
 
         return getEndTime().plusMinutes(5);
     }
-
-    public TodoItem() {}
-
-    public TodoItem(String name, Integer duration, ItemType itemType, boolean isPinned, Priority priority) {
-        this.name = name;
-        this.duration = duration;
-        this.itemType = itemType;
-        this.isPinned = isPinned;
-        this.priority = priority;
-
-        // initialize with day end
-        this.deadline = new DateTime().withTimeAtStartOfDay().plusDays(1);
-    }
-
-    public TodoItem(String name, Integer duration, ItemType itemType, boolean isPinned, Priority priority, DateTime deadline) {
-        this(name, duration, itemType, isPinned, priority);
-        this.deadline = deadline;
-    }
-
 
     public String toString() {
         return "{" +

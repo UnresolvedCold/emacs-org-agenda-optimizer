@@ -5,13 +5,10 @@ import ai.timefold.solver.core.api.domain.solution.PlanningScore;
 import ai.timefold.solver.core.api.domain.solution.PlanningSolution;
 import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
 import ai.timefold.solver.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
-import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
 import lombok.Getter;
 import org.joda.time.DateTime;
-
-import java.time.LocalTime;
-import java.util.List;
 
 @Getter
 @PlanningSolution

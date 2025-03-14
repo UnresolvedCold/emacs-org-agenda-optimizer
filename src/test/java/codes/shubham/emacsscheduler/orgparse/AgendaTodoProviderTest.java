@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class AgendaTodoProviderTest {
 
@@ -16,8 +14,8 @@ class AgendaTodoProviderTest {
     AgendaTodoProvider agendaTodoProvider;
 
     @Test
-    void getAllTodosFromOrgFilesAndDirectories() {
+    void getTodos() {
         System.out.println(applicationProperties.getOrgDirectoryList());
-        System.out.println(agendaTodoProvider.getAllTodosFromOrgFilesAndDirectories());
+        System.out.println(agendaTodoProvider.getTodos());
     }
 }
